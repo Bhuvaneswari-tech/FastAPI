@@ -134,3 +134,6 @@ Response to Client
 
 traceback
 Used to print full stack trace when exception happens.
+
+For testcases
+pip install pytest httpx pytest-asyncio
