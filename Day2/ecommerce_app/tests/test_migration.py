@@ -1,50 +1,22 @@
-# import subprocess
-# import sys
-# import os
+import os
+from alembic import command
+from alembic.config import Config
 
-# PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-# ALEMBIC_INI = os.path.join(PROJECT_ROOT, "alembic.ini")
-
-# def test_alembic_upgrade():
-#     result = subprocess.run(
-#         [
-#             sys.executable,
-#             "-m",
-#             "alembic",
-#             "-c",
-#             ALEMBIC_INI,  # 👈 explicitly pass config
-#             "upgrade",
-#             "head",
-#         ],
-#         capture_output=True,
-#         text=True,
-#         cwd=PROJECT_ROOT,
-#     )
-
-#     print(result.stdout)
-#     print(result.stderr)
-
-#     assert result.returncode == 0
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ALEMBIC_INI = os.path.join(PROJECT_ROOT, "alembic.ini")
 
 
-# def test_alembic_downgrade():
-#     result = subprocess.run(
-#         [
-#             sys.executable,
-#             "-m",
-#             "alembic",
-#             "-c",
-#             ALEMBIC_INI,  # 👈 explicitly pass config
-#             "downgrade",
-#             "-1",
-#         ],
-#         capture_output=True,
-#         text=True,
-#         cwd=PROJECT_ROOT,
-#     )
+def get_alembic_config():
+    config = Config(ALEMBIC_INI)
+    config.set_main_option("script_location", os.path.join(PROJECT_ROOT, "alembic"))
+    return config
 
-#     print(result.stdout)
-#     print(result.stderr)
 
-#     assert result.returncode == 0
+def test_alembic_upgrade():
+    config = get_alembic_config()
+    command.upgrade(config, "head")
+
+
+def test_alembic_downgrade():
+    config = get_alembic_config()
+    command.downgrade(config, "base")

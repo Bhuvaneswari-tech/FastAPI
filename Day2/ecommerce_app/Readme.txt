@@ -137,3 +137,24 @@ Used to print full stack trace when exception happens.
 
 For testcases
 pip install pytest httpx pytest-asyncio
+
+Migration
+rm alembic.ini
+rm -rf alembic
+Goto alembic.ini and change the url
+sqlalchemy.url = sqlite:///./test.db
+
+How to check
+alembic upgrade head
+
+Run the testcases
+pytest -v
+
+
+What Is Alembic?
+Alembic is a database migration tool for SQLAlchemy.
+It helps you:
+✔ Create database tables
+✔ Modify schema (add column, drop column, rename table)
+✔ Version control your database - v1.0
+✔ Upgrade / downgrade schema safely
