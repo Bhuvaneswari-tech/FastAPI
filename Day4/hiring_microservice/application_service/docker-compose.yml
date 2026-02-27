@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:15
+    container_name: application-postgres
+    environment:
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: applicationdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - application-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sa"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  application-service:
+    build: .
+    container_name: application-service
+    ports:
+      - "8005:8005"
+    env_file:
+      - .env.docker
+    depends_on:
+      db:
+        condition: service_healthy   # ✅ THIS IS THE FIX
+    restart: always
+    networks:
+      - application-network
+
+volumes:
+  postgres_data:
+
+networks:
+  application-network:

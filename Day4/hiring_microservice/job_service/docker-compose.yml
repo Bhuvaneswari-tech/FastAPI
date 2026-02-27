@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:15
+    container_name: job-postgres
+    environment:
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: jobdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - job-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sa"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  job-service:
+    build: .
+    container_name: job-service
+    ports:
+      - "8004:8004"
+    env_file:
+      - .env.docker
+    depends_on:
+      db:
+        condition: service_healthy   # ✅ THIS IS THE FIX
+    restart: always
+    networks:
+      - job-network
+
+volumes:
+  postgres_data:
+
+networks:
+  job-network:
