@@ -10,18 +10,18 @@ services:
     env_file:
       - .env.docker
     depends_on:
-      - db
+      - postgres
     restart: always
     networks:
       - auth-network
 
-  db:
+  postgres:
     image: postgres:15
     container_name: auth-postgres
     environment:
-      POSTGRES_USER: sa
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: authdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
     ports:
       - "5432:5432"
     volumes:

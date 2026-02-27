@@ -1,4 +1,24 @@
+version: "3.9"
+
 services:
+
+  postgres:
+    image: postgres:15
+    container_name: user-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: user_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - user-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   user-service:
     build: .
@@ -8,20 +28,8 @@ services:
     env_file:
       - .env.docker
     depends_on:
-      - db
-    restart: always
-    networks:
-      - user-network
-
-  db:
-    image: postgres:15
-    container_name: user-postgres
-    environment:
-      POSTGRES_USER: sa
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: userdb
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      postgres:
+        condition: service_healthy
     restart: always
     networks:
       - user-network
