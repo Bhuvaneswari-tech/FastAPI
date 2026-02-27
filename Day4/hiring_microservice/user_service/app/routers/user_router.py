@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.services.user_service import UserService
-from app.schemas.user_schema import UserCreate, UserUpdate, UserResponse, UserLogin
+from app.schemas.user_schema import UserCreate, UserUpdate, UserResponse, UserLogin, TokenResponse
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -18,12 +18,12 @@ def create_user(
     return user_service.create_user(payload)
 
 
-@router.post("/login", response_model=UserResponse)
+@router.post("/login", response_model=TokenResponse)
 def login(
     payload: UserLogin,
     user_service: UserService = Depends(get_user_service)
 ):
-    access_token = user_service.authenticate_user(
+    access_token = user_service.login_user(
         payload.email,
         payload.password
     )
@@ -33,25 +33,25 @@ def login(
         "token_type": "bearer"
     }
 
-@router.get("/{email}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=UserResponse)
 def get_user(
-    email: str,
+    user_id: int,
     user_service: UserService = Depends(get_user_service)
 ):
-    return user_service.get_user_by_email(email)
+    return user_service.get_user_by_id(user_id)
 
-@router.put("/{email}", response_model=UserResponse)
+@router.put("/{user_id}", response_model=UserResponse)
 def update_user(
-    email: str,
+    user_id: int,
     payload: UserUpdate,
     user_service: UserService = Depends(get_user_service)
 ):
-    return user_service.update_user(email, payload)
+    return user_service.update_user(user_id, payload)
 
-@router.delete("/{email}")
+@router.delete("/{user_id}")
 def delete_user(
-    email: str,
+    user_id: int,
     user_service: UserService = Depends(get_user_service)
 ):
-    user_service.delete_user(email)
+    user_service.delete_user(user_id)
     return {"message": "User deleted successfully"}
